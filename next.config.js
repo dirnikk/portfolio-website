@@ -8,9 +8,14 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    serverActions: true,
+  // experimental: {
+  //   serverActions: true,
+  // },
+  images: {
+    unoptimized: true
   },
+  output: 'export',
+  distDir: 'dist'
 }
 
 module.exports = nextConfig

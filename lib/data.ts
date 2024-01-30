@@ -79,7 +79,7 @@ export const projectsData = [
     imageUrl: eduspire,
   },
   {
-    title: 'rmtDev',
+    title: 'Bluebeam-Nevaris',
     description:
       'In this role, I collaborated extensively with developer teams based in both the USA and Germany. I spearheaded the construction and migration of CI/CD pipelines, transitioning from Jenkins to GitLab CI. Additionally, I implemented various improvements essential for the seamless adoption of the new application by Bluebeam.',
     tags: ['AWS', 'EKS', 'Gitlab-CI', '.NET', 'React'],
