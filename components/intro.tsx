@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { BsArrowRight, BsLinkedin } from "react-icons/bs";
@@ -13,6 +13,34 @@ import { useActiveSectionContext } from "@/context/active-section-context";
 export default function Intro() {
   const { ref } = useSectionInView("Home", 0.5);
   const { setActiveSection, setTimeOfLastClick } = useActiveSectionContext();
+  const [showModal, setShowModal] = useState(false);
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+
+  const handleDownload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    const res = await fetch("/api/cv", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
+    if (!res.ok) {
+      setError("Invalid code");
+      return;
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "CV.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setShowModal(false);
+    setCode("");
+  };
 
   return (
     <section
@@ -90,14 +118,13 @@ export default function Intro() {
           <BsArrowRight className='opacity-70 group-hover:translate-x-1 transition' />
         </Link>
 
-        <a
+        <button
           className='group bg-white px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-110 hover:scale-110 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10'
-          href='/CV.pdf'
-          download
+          onClick={() => setShowModal(true)}
         >
           Download CV{' '}
           <HiDownload className='opacity-60 group-hover:translate-y-1 transition' />
-        </a>
+        </button>
 
         <a
           className='bg-white p-4 text-gray-700 hover:text-gray-950 flex items-center gap-2 rounded-full focus:scale-[1.15] hover:scale-[1.15] active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10 dark:text-white/60'
@@ -115,6 +142,43 @@ export default function Intro() {
           <FaGithubSquare />
         </a>
       </motion.div>
+
+      {showModal && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div className='bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg'>
+            <form onSubmit={handleDownload} className='flex flex-col gap-2'>
+              <input
+                type='password'
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder='Enter code'
+                className='border px-3 py-2 rounded'
+              />
+              {error && (
+                <p className='text-red-500 text-sm'>{error}</p>
+              )}
+              <div className='flex justify-end gap-2 pt-2'>
+                <button
+                  type='button'
+                  onClick={() => {
+                    setShowModal(false);
+                    setError("");
+                  }}
+                  className='px-4 py-2 rounded bg-gray-200 dark:bg-gray-800'
+                >
+                  Cancel
+                </button>
+                <button
+                  type='submit'
+                  className='px-4 py-2 rounded bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+                >
+                  Download
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
